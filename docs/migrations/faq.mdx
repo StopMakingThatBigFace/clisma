@@ -1,7 +1,7 @@
 ---
-title: FAQ
+title: "FAQ"
+description: "Answers to common questions about clisma migrations"
 ---
-
 
 ## Custom table name
 
@@ -38,7 +38,7 @@ env "production" {
 
 Default replication path:
 
-```sh
+```text
 /clickhouse/tables/cluster-{cluster}/shard-{shard}/{database}/${migrations.table_name}
 ```
 
@@ -52,7 +52,7 @@ If `cluster_name` is not set in config and ClickHouse reports configured cluster
 stops and asks you to set `cluster_name`. If there are no clusters, it uses
 `ReplacingMergeTree()` in standalone mode.
 
-## Does clisma support Down migrations?
+## Does clisma support down migrations?
 
 No. This is intentional. ClickHouse DDL and data changes are often
 non-transactional and may be irreversible. Reliable rollbacks are hard to
@@ -60,7 +60,7 @@ guarantee and can introduce more risk than they remove. The expected workflow
 is to apply new forward migrations that correct or compensate for previous
 changes.
 
-## Does clisma support Multi-statement migrations?
+## Does clisma support multi-statement migrations?
 
 Yes. You can include multiple SQL statements in one file. Separate statements with
 semicolons; clisma splits them outside of strings and comments.

@@ -1,6 +1,13 @@
 ---
-title: Getting Started
+title: "Getting started"
+description: "Install clisma and run your first ClickHouse migration"
 ---
+
+<Info>
+  **Prerequisites**:
+  - Access to a ClickHouse instance and credentials
+  - A project directory where you can add `clisma.hcl`
+</Info>
 
 clisma is a ClickHouse migration tool with templating support and environment configuration.
 
@@ -18,7 +25,8 @@ npm install -g clisma
 
 ## Quickstart
 
-### 1. Create a config
+<Steps>
+<Step title="Create a config">
 
 Create `clisma.hcl` in your project root:
 
@@ -31,26 +39,33 @@ env "local" {
   }
 }
 ```
+</Step>
 
-### 2. Create your first migration
+<Step title="Create your first migration">
 
 ```bash
 clisma create
 ```
+</Step>
 
-### 3. Run it
+<Step title="Run it">
 
 ```bash
 clisma run --env local
 ```
+</Step>
 
-### 4. Check status
+<Step title="Check status">
 
 ```bash
 clisma status --env local
 ```
+</Step>
+</Steps>
 
-You can also pass config variables and load environment files:
+## Advanced usage
+
+You can pass variables and load environment files when you run migrations:
 
 ```bash
 clisma run --env local --var ttl_days=30 --env-file .env

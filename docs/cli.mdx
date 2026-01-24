@@ -1,10 +1,14 @@
 ---
-title: CLI
+title: "CLI"
+description: "Run, inspect, and create migrations from the command line"
 ---
 
-Clisma ships a CLI for applying and inspecting migrations.
+<Info>
+  **Prerequisites**:
+  - A `clisma.hcl` config file in the current directory, or pass `--config`
+</Info>
 
-The CLI requires a config file. Use `--config` or place `clisma.hcl` in the current directory.
+Clisma ships a CLI for applying and inspecting migrations.
 
 ## Commands
 
@@ -59,5 +63,13 @@ clisma checksum ./migrations/20240101123045_create_users.sql
   Example: `--var ttl_days=30 --var replication_factor=3`
 
 - **`--env-file <path>` — load env vars from file.**
-  
+
   Example: `--env-file .env`
+
+## Advanced usage
+
+Run with a custom config path and multiple variables:
+
+```bash
+clisma run --config ./infra/clisma.hcl --env staging --var ttl_days=30 --var replication_factor=2
+```

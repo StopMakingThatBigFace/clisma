@@ -1,11 +1,10 @@
 ---
-title: clisma
+title: "Clisma"
+description: "Overview of the ClickHouse migration tool and how you use it"
 ---
 
 Clisma is a ClickHouse migration tool with templating support and environment configuration.
-Think of it as a tiny, pragmatic CLI for migrations with a bit of templating sugar.
-
-Use the CLI for day-to-day workflows, or the core package for programmatic control.
+You use the CLI for day-to-day workflows, or the core package for programmatic control.
 
 ## What it does
 
@@ -15,12 +14,12 @@ Use the CLI for day-to-day workflows, or the core package for programmatic contr
 
 ## Inspiration
 
-This project borrows ideas from tools we like:
+This project borrows ideas from tools you may already know:
 
 - [Prisma](https://www.prisma.io/) for the simple, friendly CLI experience.
-- [Atlas](https://atlasgo.io/) for the idea of templated migrations and config-driven environments.
+- [Atlas](https://atlasgo.io/) for templated migrations and config-driven environments.
 
-For Atlas, the inspiration is templated migrations and environment config:
+Related Atlas concepts:
 
 - [Templated migrations](https://atlasgo.io/concepts/migrations#template)
 - [Environment configuration](https://atlasgo.io/concepts/dev-database)
@@ -32,5 +31,6 @@ For Atlas, the inspiration is templated migrations and environment config:
 
 ## Next steps
 
-- Install the CLI and run your first migration.
-- Set up `clisma.hcl` with `migrations` and variables.
+- Follow the [Getting started](./getting-started) guide.
+- Define your environments in [Configuration](./configuration/overview).
+- Learn about [Templates](./migrations/templates) for advanced SQL.
