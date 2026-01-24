@@ -2,15 +2,15 @@
 
 **A ClickHouse migrations CLI with templated SQL and environment-aware config.**
 
-<small>_"clisma" is a mashup of ClickHouse + Prisma. A dumb pun, but it stuck._</small>
+![NPM Version](https://img.shields.io/npm/v/clisma)
+![GitHub top language](https://img.shields.io/github/languages/top/will-work-for-meal/clisma)
+![GitHub Repo stars](https://img.shields.io/github/stars/will-work-for-meal/clisma)
 
-This project borrows ideas from tools we like:
+<small>_"clisma" is a mashup of ClickHouse + Prisma. A dumb pun, but it stuck._ 👉👈</small>
 
-- **[Atlas](https://atlasgo.io/)** for the idea of [templated migrations](https://atlasgo.io/concepts/migrations#template) and [config-driven environments](https://atlasgo.io/concepts/dev-database).
+<p><strong><a href="https://clisma.poorquality.tech/" style="font-size: 1.2em;">See full detailed (fancy!) Docs →</a></strong></p>
 
-- **[Prisma](https://www.prisma.io/)** for the simple, friendly CLI experience.
-
-### So why it exists?
+## What is for?
 
 - **Templates in migrations** — Atlas has this, but it is paid; clisma keeps it simple and open.
 - **Multi-statement migrations** — write real SQL without splitting into tiny files.
@@ -136,3 +136,11 @@ Example with variables and env file:
 ```bash
 clisma run --env local --var ttl_days=30 --env-file .env
 ```
+
+## So What is this
+
+This project borrows ideas from tools we like:
+
+- **[Atlas](https://atlasgo.io/)** for the idea of [templated migrations](https://atlasgo.io/concepts/migrations#template) and [config-driven environments](https://atlasgo.io/concepts/dev-database).
+
+- **[Prisma](https://www.prisma.io/)** for the simple, friendly CLI experience.
