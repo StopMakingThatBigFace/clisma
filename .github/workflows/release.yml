@@ -24,7 +24,7 @@ jobs:
           cache: "npm"
       - name: Update npm to support Trusted Publishers
         run: npm install -g npm@^11.5
-      - run: npm ci
+      - run: npm i
       - run: cp README.md packages/cli/README.md
       - run: npm run build -w packages/config
       - run: npm run build -w packages/core
