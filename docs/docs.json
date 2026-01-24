@@ -1,0 +1,69 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "aspen",
+  "name": "clisma",
+  "colors": {
+    "primary": "#16A34A",
+    "light": "#07C983",
+    "dark": "#15803D"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Getting started",
+            "icon": "rocket-launch",
+            "pages": [
+              "index",
+              "installation"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "icon": "database",
+            "pages": [
+              "configuration/overview",
+              "configuration/env-and-vars",
+              "configuration/examples"
+            ]
+          },
+          {
+            "group": "Migrations",
+            "pages": [
+              "migrations/how-it-works",
+              "migrations/templates",
+              "migrations/naming",
+              "migrations/faq"
+            ]
+          },
+          {
+            "group": "CLI",
+            "icon": "game-console-handheld",
+            "pages": [
+              "cli"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  }
+}
