@@ -1,10 +1,12 @@
 ---
-title: "CLI"
+title: "Commands"
 description: "Run, inspect, and create migrations from the command line"
+icon: "terminal"
 ---
 
 <Info>
   **Prerequisites**:
+
   - A `clisma.hcl` config file in the current directory, or pass `--config`
 </Info>
 
@@ -50,19 +52,16 @@ clisma checksum ./migrations/20240101123045_create_users.sql
 
 ## Flags
 
-- **`--env <name>` — environment from config file.**
+- **`--env <name> — environment from config file.`**
 
   Example: `--env production`
-
-- **`--config <path>` — path to config file.**
+- **`--config <path> — path to config file.`**
 
   Example: `--config ./clisma.hcl`
-
-- **`--var <key=value>` — set variable value (repeatable).**
+- **`--var <key=value> — set variable value (repeatable).`**
 
   Example: `--var ttl_days=30 --var replication_factor=3`
-
-- **`--env-file <path>` — load env vars from file.**
+- **`--env-file <path> — load env vars from file.`**
 
   Example: `--env-file .env`
 

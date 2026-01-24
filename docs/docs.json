@@ -15,13 +15,15 @@
         "groups": [
           {
             "group": "Getting started",
+            "icon": "rocket-launch",
             "pages": [
               "index",
-              "getting-started"
+              "installation"
             ]
           },
           {
             "group": "Configuration",
+            "icon": "database",
             "pages": [
               "configuration/overview",
               "configuration/env-and-vars",
@@ -39,6 +41,7 @@
           },
           {
             "group": "CLI",
+            "icon": "game-console-handheld",
             "pages": [
               "cli"
             ]
