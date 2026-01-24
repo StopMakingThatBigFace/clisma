@@ -29,6 +29,33 @@ jobs:
       - run: npm run build -w packages/config
       - run: npm run build -w packages/core
       - run: npm run build -w packages/cli
+      - name: Check publishable versions
+        id: versions
+        shell: bash
+        run: |
+          get_local_version() {
+            node -e "console.log(require('./$1/package.json').version)"
+          }
+
+          can_publish() {
+            local pkg="$1"
+            local dir="$2"
+            local key="$3"
+            local version
+            version="$(get_local_version "$dir")"
+            if npm view "$pkg@$version" version >/dev/null 2>&1; then
+              echo "SKIP_$key=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "SKIP_$key=false" >> "$GITHUB_OUTPUT"
+            fi
+          }
+
+          can_publish "@clisma/config" "packages/config" "CONFIG"
+          can_publish "@clisma/core" "packages/core" "CORE"
+          can_publish "clisma" "packages/cli" "CLI"
       - run: npm publish -w packages/config --access public --provenance
+        if: steps.versions.outputs.SKIP_CONFIG != 'true'
       - run: npm publish -w packages/core --access public --provenance
+        if: steps.versions.outputs.SKIP_CORE != 'true'
       - run: npm publish -w packages/cli --access public --provenance
+        if: steps.versions.outputs.SKIP_CLI != 'true'

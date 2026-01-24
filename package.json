@@ -19,6 +19,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "dev:cli": "npm run -w packages/cli dev --"
+    "dev:cli": "npm run -w packages/cli dev --",
+    "bump:packages": "npm version patch -w packages/config -w packages/core -w packages/cli --no-git-tag-version"
   }
 }
