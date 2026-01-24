@@ -1,0 +1,2 @@
+-- wtf
+SELECT 2;

@@ -1,0 +1,24 @@
+{
+  "name": "clisma-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=18.19.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "turbo": "^2.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "dev:cli": "npm run -w packages/cli dev --"
+  }
+}

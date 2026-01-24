@@ -1,0 +1,55 @@
+---
+title: Examples
+---
+
+## Local
+
+```hcl
+env "local" {
+  url = "http://default:password@localhost:8123/mydb"
+
+  migrations {
+    dir = "migrations"
+  }
+}
+```
+
+## Staging
+
+```hcl
+env "staging" {
+  url = env("CLICKHOUSE_STAGING_URL")
+
+  migrations {
+    dir = "migrations"
+    vars = {
+      replication_factor = 2
+      ttl_days = 30
+    }
+  }
+}
+```
+
+## Production
+
+```hcl
+env "production" {
+  url = env("CLICKHOUSE_PROD_URL")
+  cluster_name = "prod-cluster"
+  exclude = ["system.*", "_tmp_*"]
+
+  migrations {
+    dir = "migrations"
+    table_name = "schema_migrations"
+    vars = {
+      replication_factor = var.replication_factor
+      ttl_days = 90
+    }
+  }
+}
+
+variable "replication_factor" {
+  type = string
+  default = "3"
+}
+```

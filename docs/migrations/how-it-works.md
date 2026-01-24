@@ -1,0 +1,21 @@
+---
+title: How Migrations Work
+---
+
+## Migrations table
+
+clisma records applied migrations in a ClickHouse table (default:
+`schema_migrations`). Each row includes:
+
+- `version` (timestamp prefix)
+- `name` (filename suffix)
+- `checksum` (sha256 of file contents)
+- `hostname` (machine name that applied the migration)
+- `applied_by` (user who applied the migration)
+- `cli_version` (clisma CLI version)
+- `applied_at` (server time)
+
+## Checksums
+
+If a migration file changes after being applied, clisma stops with a checksum
+mismatch error. Create a new migration instead of editing the old one.

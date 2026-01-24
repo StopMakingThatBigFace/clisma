@@ -1,0 +1,55 @@
+{
+  "name": "clisma",
+  "version": "0.1.0",
+  "description": "ClickHouse migration CLI",
+  "author": "github.com/will-work-for-meal",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/will-work-for-meal/clisma.git"
+  },
+  "bugs": {
+    "url": "https://github.com/will-work-for-meal/clisma/issues"
+  },
+  "homepage": "https://github.com/will-work-for-meal/clisma",
+  "keywords": [
+    "cli",
+    "clickhouse",
+    "migrations",
+    "clickhouse-migrations",
+    "clickhouse-migration",
+    "clickhouse-migrate",
+    "atlas",
+    "atlasgo"
+  ],
+  "type": "module",
+  "bin": {
+    "clisma": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@clisma/core": "^0.1.0",
+    "@dotenvx/dotenvx": "^1.51.4",
+    "@inquirer/prompts": "^8.2.0",
+    "commander": "^12.1.0",
+    "kleur": "^4.1.5"
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "dev": "node --import tsx src/cli.ts",
+    "test": "node --import tsx --test \"src/tests/**/*.test.ts\"",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
+    "format": "oxfmt --check src",
+    "format:fix": "oxfmt src"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.4.0",
+    "oxlint": "^0.12.0"
+  }
+}

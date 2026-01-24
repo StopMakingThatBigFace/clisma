@@ -1,0 +1,77 @@
+---
+title: FAQ
+---
+
+
+## Custom table name
+
+You can override the table name in config:
+
+```hcl
+env "local" {
+  url = "http://default:password@localhost:8123/mydb"
+
+  migrations {
+    dir = "migrations"
+    table_name = "custom_schema_migrations"
+  }
+}
+```
+
+## Custom replication path
+
+In clustered setups you can override the migrations table replication path used by
+`ReplicatedReplacingMergeTree(...)`:
+
+```hcl
+env "production" {
+  url = env("CLICKHOUSE_PROD_URL")
+  cluster_name = "prod-cluster"
+
+  migrations {
+    dir = "migrations"
+    table_name = "custom_schema_migrations"
+    replication_path = "/clickhouse/foo/bar/custom_schema_migrations"
+  }
+}
+```
+
+Default replication path:
+
+```sh
+/clickhouse/tables/cluster-{cluster}/shard-{shard}/{database}/${migrations.table_name}
+```
+
+### Summary
+
+If `env.cluster_name` is set, clisma treats the environment as clustered and
+creates the migrations table using `ReplicatedReplacingMergeTree(...)` with
+`ON CLUSTER "<cluster_name>"`.
+
+If `cluster_name` is not set in config and ClickHouse reports configured clusters, clisma
+stops and asks you to set `cluster_name`. If there are no clusters, it uses
+`ReplacingMergeTree()` in standalone mode.
+
+## Does clisma support Down migrations?
+
+No. This is intentional. ClickHouse DDL and data changes are often
+non-transactional and may be irreversible. Reliable rollbacks are hard to
+guarantee and can introduce more risk than they remove. The expected workflow
+is to apply new forward migrations that correct or compensate for previous
+changes.
+
+## Does clisma support Multi-statement migrations?
+
+Yes. You can include multiple SQL statements in one file. Separate statements with
+semicolons; clisma splits them outside of strings and comments.
+
+## Checksum mismatch
+
+If a migration file changes after being applied, clisma will fail with a
+checksum mismatch. You have two options:
+
+- Revert the migration file back to the applied version and create a new
+  forward migration.
+- If you really need to override the checksum, update the stored checksum in
+  the migrations table (use `clisma checksum <migration path>`). This is risky
+  and should only be done if you fully understand the consequences.

@@ -1,0 +1,32 @@
+name: "🚀 Release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+      - run: npm ci
+      - run: cp README.md packages/cli/README.md
+      - run: npm run build -w packages/config
+      - run: npm run build -w packages/core
+      - run: npm run build -w packages/cli
+      - run: npm publish -w packages/config --access public --provenance
+      - run: npm publish -w packages/core --access public --provenance
+      - run: npm publish -w packages/cli --access public --provenance

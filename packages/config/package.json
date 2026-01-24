@@ -1,0 +1,26 @@
+{
+  "name": "@clisma/config",
+  "version": "0.1.0",
+  "description": "Configuration parsing and schema generation for clisma",
+  "type": "module",
+  "main": "dist/config.js",
+  "types": "dist/config.d.ts",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@cdktf/hcl2json": "^0.21.0"
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "test": "node --import tsx --test \"src/tests/**/*.test.ts\"",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
+    "format": "oxfmt --check src",
+    "format:fix": "oxfmt src"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.4.0",
+    "oxlint": "^0.12.0"
+  }
+}

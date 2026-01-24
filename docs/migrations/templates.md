@@ -1,0 +1,62 @@
+---
+title: Templates
+---
+
+Template variables come from `migrations.vars` in your config. If you set
+`cluster_name` on the environment, it is also available as `{{cluster_name}}`.
+
+> If you have used Atlas, this will feel familiar. The idea is the same as
+> [Atlas templated migrations](https://atlasgo.io/concepts/migrations#template),
+> but clisma uses Handlebars instead of Go templates. See the
+> [Handlebars docs](https://handlebarsjs.com/guide/) for syntax examples.
+
+## Environment-specific templating
+
+You can define template variables per environment in `migrations.vars` to make
+the same migration work differently across environments.
+
+A common case is: local runs standalone tables, while production runs a replicated cluster. In
+that case you can set `is_replicated`, `create_table_options` per environment and let the same SQL adapt at runtime.
+
+```hcl
+env "local" {
+  url = "http://default:password@localhost:8123/mydb"
+
+  migrations {
+    dir = "migrations"
+  }
+}
+
+env "production" {
+  url = env("CLICKHOUSE_PROD_URL")
+  cluster_name = "prod-cluster"
+
+  migrations {
+    dir = "migrations"
+    vars = {
+      is_replicated = true
+      create_table_options = "ON CLUSTER prod-cluster"
+    }
+  }
+}
+```
+
+## Example migration
+
+```sql
+CREATE TABLE IF NOT EXISTS events {{create_table_options}} (
+  id UUID,
+  created_at DateTime
+)
+{{#if is_replicated}}
+ENGINE = ReplicatedMergeTree('/clickhouse/tables/{cluster}/events', '{replica}')
+{{else}}
+ENGINE = MergeTree()
+{{/if}}
+ORDER BY id;
+```
+
+Note: `{cluster}` and `{replica}` are ClickHouse macros, not clisma template
+variables. See the [ClickHouse macros docs](https://clickhouse.com/docs/en/operations/server-configuration-parameters/settings#macros).
+
+You can replace them with your own values if you want to avoid macros.

@@ -1,0 +1,64 @@
+---
+title: Configuration Overview
+---
+
+Clisma uses an HCL config file to define environments and migration settings.
+
+The root blocks are:
+
+- `env "name"` for a database environment
+- `variable "name"` for user-defined inputs
+
+## Minimum config
+
+```hcl
+env "local" {
+  url = "http://default:password@localhost:8123/mydb"
+
+  migrations {
+    dir = "migrations"
+  }
+}
+```
+
+## env "name"
+
+```hcl
+env "local" {
+  url = "http://default:password@localhost:8123/mydb"
+  cluster_name = "prod-cluster"
+
+  migrations {
+    dir = "migrations"
+    table_name = "schema_migrations"
+    replication_path = "/clickhouse/tables/prod/schema_migrations"
+    vars = {
+      ttl_days = 30
+    }
+  }
+}
+```
+
+Fields:
+
+- `url` (string) Connection string. Supports `env("NAME")`.
+- `cluster_name` (string, optional) Cluster name used for template context and replicated tracking. Required when your server has clusters configured.
+- `exclude` (list<string>, optional) Patterns to ignore.
+- `migrations` (block) Migration settings.
+
+## migrations
+
+- `dir` (string) Path to migrations directory.
+- `table_name` (string, optional) Custom tracking table.
+- `replication_path` (string, optional) Replication path for the tracking table.
+- `vars` (object, optional) Variables for Handlebars templates.
+
+## variable "name"
+
+```hcl
+variable "ttl_days" {
+  type = string
+  default = "30"
+  description = "Default TTL"
+}
+```

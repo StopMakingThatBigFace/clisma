@@ -1,0 +1,55 @@
+---
+title: env() and Variables
+---
+
+## env()
+
+Use `env("NAME")` to read environment variables:
+
+```hcl
+env "local" {
+  url = env("CLICKHOUSE_URL")
+
+  migrations {
+    dir = "migrations"
+  }
+}
+```
+
+## Variables
+
+Define variables and reference them with `var.name`:
+
+```hcl
+variable "ttl_days" {
+  type = string
+  default = "30"
+}
+
+env "local" {
+  url = env("CLICKHOUSE_URL")
+
+  migrations {
+    dir = "migrations/${var.ttl_days}"
+    vars = {
+      ttl = var.ttl_days
+    }
+  }
+}
+```
+
+## Cluster name
+
+If you want migrations_table to be replicated and use cluster-aware templates, set
+`cluster_name` in the environment:
+
+```hcl
+env "production" {
+  url = env("CLICKHOUSE_PROD_URL")
+  cluster_name = "prod-cluster"
+
+  migrations {
+    dir = "migrations"
+  }
+}
+```

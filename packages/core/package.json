@@ -1,0 +1,30 @@
+{
+  "name": "@clisma/core",
+  "version": "0.1.0",
+  "description": "Core ClickHouse migration logic for clisma",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@clisma/config": "*",
+    "@clickhouse/client": "^1.11.2",
+    "handlebars": "^4.7.8",
+    "kleur": "^4.1.5",
+    "ora": "^9.1.0"
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "test": "node --import tsx --test \"src/tests/**/*.test.ts\"",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
+    "format": "oxfmt --check src",
+    "format:fix": "oxfmt src"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.4.0",
+    "oxlint": "^0.12.0"
+  }
+}
