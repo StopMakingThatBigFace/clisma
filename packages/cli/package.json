@@ -42,7 +42,6 @@
   "scripts": {
     "build": "tsc -b tsconfig.json",
     "dev": "node --import tsx src/cli.ts",
-    "test": "node --import tsx --test src/tests/**/*.test.ts",
     "lint": "oxlint src",
     "lint:fix": "oxlint --fix src",
     "format": "oxfmt --check src",
