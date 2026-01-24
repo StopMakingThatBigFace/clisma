@@ -22,6 +22,8 @@ jobs:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
+      - name: Update npm to support Trusted Publishers
+        run: npm install -g npm@^11.5
       - run: npm ci
       - run: cp README.md packages/cli/README.md
       - run: npm run build -w packages/config
