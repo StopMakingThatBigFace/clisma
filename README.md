@@ -2,13 +2,9 @@
 
 **A ClickHouse migrations CLI with templated SQL and environment-aware config.**
 
-![NPM Version](https://img.shields.io/npm/v/clisma)
-![GitHub top language](https://img.shields.io/github/languages/top/will-work-for-meal/clisma)
-![GitHub Repo stars](https://img.shields.io/github/stars/will-work-for-meal/clisma)
-
 <small>_"clisma" is a mashup of ClickHouse + Prisma. A dumb pun, but it stuck._ 👉👈</small>
 
-<p><strong><a href="https://clisma.poorquality.tech/" style="font-size: 1.2em;">See full detailed (fancy!) Docs →</a></strong></p>
+<p><strong><a href="https://clisma.poorquality.tech/" style="font-size: 1.3em;">💅 More Docs →</a></strong></p>
 
 ## What is for?
 
