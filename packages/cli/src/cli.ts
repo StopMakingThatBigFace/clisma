@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import path from "node:path";
 import fs from "node:fs/promises";
 import crypto from "node:crypto";
@@ -48,7 +50,6 @@ const parseEnvFile = async (
   const contents = await fs.readFile(filePath, "utf8");
   return parseDotenv(contents);
 };
-
 
 const resolveEnvName = async (
   configPath: string,
@@ -109,7 +110,10 @@ const runCommand = async (
   );
 
   connectionString = envConfig.url;
-  migrationsDir = path.resolve(path.dirname(configPath), envConfig.migrations.dir);
+  migrationsDir = path.resolve(
+    path.dirname(configPath),
+    envConfig.migrations.dir,
+  );
 
   // Extract table_name, cluster_name, and replication_path from config
   tableName = envConfig.migrations.table_name;
@@ -184,7 +188,10 @@ program
       envOverrides,
     );
 
-    migrationsDir = path.resolve(path.dirname(configPath), envConfig.migrations.dir);
+    migrationsDir = path.resolve(
+      path.dirname(configPath),
+      envConfig.migrations.dir,
+    );
 
     // Get migration name from flag or prompt
     let migrationName = options.name;
