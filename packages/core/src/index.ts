@@ -1,4 +1,5 @@
 export { MigrationRunner, runMigrations } from "./migrations/runner.js";
+export { resolvePackageVersion } from "./utils.js";
 export type {
   MigrationCommand,
   MigrationRunnerOptions,

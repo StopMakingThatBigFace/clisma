@@ -6,7 +6,11 @@ import crypto from "node:crypto";
 import { Command } from "commander";
 import { input } from "@inquirer/prompts";
 import kleur from "kleur";
-import { runMigrations, findConfigFile } from "@clisma/core";
+import {
+  runMigrations,
+  findConfigFile,
+  resolvePackageVersion,
+} from "@clisma/core";
 import type { MigrationRunnerTLSOptions } from "@clisma/core";
 import { listEnvironmentsFile, parseConfigFile } from "@clisma/config";
 import { parse as parseDotenv } from "@dotenvx/dotenvx";
@@ -19,6 +23,10 @@ type CliOptions = {
 };
 
 const program = new Command();
+const cliVersion = await resolvePackageVersion(
+  import.meta.url,
+  "../package.json",
+);
 
 const withCommonOptions = (command: Command): void => {
   command
@@ -113,7 +121,7 @@ const runCommand = async (
   }
 
   const envName = await resolveEnvName(configPath, options.env);
-  console.log(`Using config file: ${kleur.bold(configPath)}`);
+  console.log(`  Config: ${kleur.bold(configPath)}`);
   const vars = parseVars(options.var);
   const envConfig = await parseConfigFile(
     configPath,
@@ -123,6 +131,12 @@ const runCommand = async (
   );
 
   connectionString = envConfig.url;
+
+  const connectionUrl = new URL(connectionString);
+  const isTlsEnabled = Boolean(envConfig.tls);
+  const defaultPort = connectionUrl.protocol === "https:" ? "8443" : "8123";
+  const port = connectionUrl.port || defaultPort;
+
   migrationsDir = path.resolve(
     path.dirname(configPath),
     envConfig.migrations.dir,
@@ -155,7 +169,10 @@ const runCommand = async (
     ...(envConfig.cluster_name ? { cluster_name: envConfig.cluster_name } : {}),
   };
 
-  console.log(`Environment: ${kleur.bold(envName)}`);
+  console.log(
+    `  Hostname: ${kleur.bold(connectionUrl.hostname)}:${kleur.bold(port)} ${isTlsEnabled ? kleur.dim("(TLS)") : ""}`,
+  );
+  console.log(`  Environment: ${kleur.bold(envName)}`);
   console.log("");
 
   await runMigrations(
@@ -172,25 +189,28 @@ const runCommand = async (
   );
 };
 
-program.name("clisma").description("ClickHouse migrations CLI");
+program
+  .name("clisma")
+  .description("💊 ClickHouse Migrations CLI")
+  .version(cliVersion, "-v, --version");
 
 withCommonOptions(
   program
     .command("run")
-    .description("Apply migrations")
+    .description("🏃 Apply Migrations")
     .action((options: CliOptions) => runCommand("run", options)),
 );
 
 withCommonOptions(
   program
     .command("status")
-    .description("Show migration status")
+    .description("🔍 Show migration Status")
     .action((options: CliOptions) => runCommand("status", options)),
 );
 
 program
   .command("create")
-  .description("Create a new migration file")
+  .description("✨ Create a New Migration file")
   .option("--config <path>", "Path to config file (default: clisma.hcl)")
   .option("--env <name>", "Environment name from config file")
   .option("--env-file <path>", "Load environment variables from file")
@@ -283,7 +303,7 @@ program
 
 program
   .command("checksum")
-  .description("Print checksum for a migration file")
+  .description("🤖 Print Checksum for a Migration file")
   .argument("<path>", "Path to migration file")
   .action(async (filePath: string) => {
     const baseCwd = process.env.INIT_CWD || process.cwd();

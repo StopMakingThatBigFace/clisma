@@ -1,6 +1,6 @@
 {
   "name": "@clisma/core",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Core ClickHouse migration logic for clisma",
   "type": "module",
   "main": "dist/index.js",

@@ -2,13 +2,11 @@ import { createClient, type ClickHouseClient } from "@clickhouse/client";
 import ora from "ora";
 import kleur from "kleur";
 import os from "node:os";
-import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import type { MigrationCommand, MigrationRunnerOptions } from "./types.js";
 import { splitStatements } from "./sql.js";
 import { renderTemplate } from "./template.js";
 import { MigrationRepository } from "./repository.js";
+import { resolvePackageVersion } from "../utils.js";
 
 const resolveAppliedBy = (): string => {
   try {
@@ -18,20 +16,8 @@ const resolveAppliedBy = (): string => {
   }
 };
 
-const resolveCliVersion = async (): Promise<string> => {
-  try {
-    const currentDir = path.dirname(fileURLToPath(import.meta.url));
-    const packagePath = path.resolve(currentDir, "../../package.json");
-
-    const contents = await fs.readFile(packagePath, "utf8");
-
-    const parsed = JSON.parse(contents) as { version?: string };
-
-    return parsed.version || "";
-  } catch {
-    return "";
-  }
-};
+const resolveCliVersion = (): Promise<string> =>
+  resolvePackageVersion(import.meta.url, "../../package.json");
 
 export class MigrationRunner {
   #client: ClickHouseClient;
@@ -64,12 +50,17 @@ export class MigrationRunner {
     this.#tls = options.tls;
     this.#templateVars = options.templateVars || {};
 
+    const isMutualTls = Boolean(this.#tls?.cert && this.#tls?.key);
     const tls = this.#tls
-      ? {
-          ca_cert: this.#tls.caCert,
-          cert: this.#tls.cert,
-          key: this.#tls.key,
-        }
+      ? isMutualTls
+        ? {
+            ca_cert: this.#tls.caCert,
+            cert: this.#tls.cert!,
+            key: this.#tls.key!,
+          }
+        : {
+            ca_cert: this.#tls.caCert,
+          }
       : undefined;
 
     const clientUrl = `${url.protocol}//${url.host}${url.search}`;
@@ -80,6 +71,7 @@ export class MigrationRunner {
       password: decodeURIComponent(url.password),
       database,
       tls,
+      set_basic_auth_header: isMutualTls ? false : undefined,
     });
 
     this.#repository = new MigrationRepository({
@@ -106,12 +98,12 @@ export class MigrationRunner {
 
         spinner.succeed(kleur.green(message));
       } else {
-        spinner.succeed("No cluster detected, using non-replicated mode");
+        spinner.info("No cluster detected, using non-replicated mode");
       }
 
       this.#initialized = true;
     } catch (error) {
-      spinner.fail("Failed to detect cluster configuration");
+      spinner.fail("Failed to detect cluster configuration:");
       throw error;
     }
   }
@@ -184,7 +176,7 @@ export class MigrationRunner {
         );
       } catch (err) {
         spinner.fail(
-          kleur.red(`Failed to apply ${migration.version}_${migration.name}`),
+          kleur.red(`Failed to apply ${migration.version}_${migration.name}:`),
         );
         throw err;
       }
@@ -210,10 +202,10 @@ export class MigrationRunner {
     console.log("");
     console.log(kleur.bold("Migration Status"));
     console.log(
-      `${kleur.green("Applied:")} ${kleur.bold(applied.size.toString())}`,
+      `  ${kleur.green("Applied:")} ${kleur.bold(applied.size.toString())}`,
     );
     console.log(
-      `${kleur.yellow("Pending:")} ${kleur.bold(pending.length.toString())}`,
+      `  ${kleur.yellow("Pending:")} ${kleur.bold(pending.length.toString())}`,
     );
     console.log("");
 
@@ -233,7 +225,9 @@ export class MigrationRunner {
     if (pending.length > 0) {
       console.log(kleur.bold("Pending migrations:"));
       pending.forEach((migration) =>
-        console.log(kleur.yellow(`  • ${migration.version}_${migration.name}`)),
+        console.log(
+          kleur.yellow(`  ⏳ ${migration.version}_${migration.name}`),
+        ),
       );
       console.log("");
     }
