@@ -91,7 +91,7 @@ If your ClickHouse endpoint uses a self-signed certificate, add a `tls` block so
 
 ```hcl
 env "production" {
-  url = env("CLICKHOUSE_URL") # e.g. https://user:pass@host:8443/db?secure=true
+  url = env("CLICKHOUSE_URL") # e.g. https://user:pass@host:8443/db
 
   tls {
     ca_file = env("CLICKHOUSE_CA_FILE")
@@ -108,7 +108,6 @@ Notes:
 - `ca_file` is required when `tls` is set.
 - `cert_file` and `key_file` must be provided together.
 - Relative paths are resolved from the directory where `clisma.hcl` lives.
-- URL query params (like `?secure=true`) are preserved.
 
 ## 🧪 Templates
 
