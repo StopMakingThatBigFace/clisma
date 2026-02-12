@@ -1,6 +1,6 @@
 {
   "name": "@clisma/config",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Configuration parsing and schema generation for clisma",
   "type": "module",
   "main": "dist/config.js",
