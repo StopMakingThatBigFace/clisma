@@ -8,6 +8,10 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StopMakingThatBigFace/clisma.git"
+  },
   "dependencies": {
     "@cdktf/hcl2json": "^0.21.0"
   },

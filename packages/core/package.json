@@ -8,6 +8,10 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StopMakingThatBigFace/clisma.git"
+  },
   "dependencies": {
     "@clisma/config": "*",
     "@clickhouse/client": "^1.11.2",
