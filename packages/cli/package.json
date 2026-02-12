@@ -2,16 +2,16 @@
   "name": "clisma",
   "version": "0.1.3",
   "description": "ClickHouse migration CLI",
-  "author": "github.com/will-work-for-meal",
+  "author": "github.com/StopMakingThatBigFace",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/will-work-for-meal/clisma.git"
+    "url": "git+https://github.com/StopMakingThatBigFace/clisma.git"
   },
   "bugs": {
-    "url": "https://github.com/will-work-for-meal/clisma/issues"
+    "url": "https://github.com/StopMakingThatBigFace/clisma/issues"
   },
-  "homepage": "https://github.com/will-work-for-meal/clisma",
+  "homepage": "https://github.com/StopMakingThatBigFace/clisma",
   "keywords": [
     "cli",
     "clickhouse",
