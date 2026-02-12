@@ -191,22 +191,18 @@ export class MigrationRepository {
   async #listClusters(): Promise<
     Array<{ cluster: string; shard_num: number; replica_num: number }>
   > {
-    try {
-      const result = await this.#client.query({
-        query: `
-          SELECT cluster, shard_num, replica_num 
-          FROM system.clusters
-        `,
-        format: "JSONEachRow",
-      });
+    const result = await this.#client.query({
+      query: `
+        SELECT cluster, shard_num, replica_num
+        FROM system.clusters
+      `,
+      format: "JSONEachRow",
+    });
 
-      return await result.json<{
-        cluster: string;
-        shard_num: number;
-        replica_num: number;
-      }>();
-    } catch {
-      return [];
-    }
+    return await result.json<{
+      cluster: string;
+      shard_num: number;
+      replica_num: number;
+    }>();
   }
 }

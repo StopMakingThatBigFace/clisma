@@ -40,6 +40,12 @@ env "production" {
   cluster_name = "prod-cluster"
   exclude = ["system.*", "_tmp_*"]
 
+  tls {
+    ca_file = env("CLICKHOUSE_CA_FILE")
+    cert_file = env("CLICKHOUSE_CLIENT_CERT_FILE")
+    key_file = env("CLICKHOUSE_CLIENT_KEY_FILE")
+  }
+
   migrations {
     dir = "migrations"
     table_name = "schema_migrations"

@@ -7,6 +7,7 @@ import { Command } from "commander";
 import { input } from "@inquirer/prompts";
 import kleur from "kleur";
 import { runMigrations, findConfigFile } from "@clisma/core";
+import type { MigrationRunnerTLSOptions } from "@clisma/core";
 import { listEnvironmentsFile, parseConfigFile } from "@clisma/config";
 import { parse as parseDotenv } from "@dotenvx/dotenvx";
 
@@ -74,6 +75,17 @@ const resolveEnvName = async (
   );
 };
 
+const resolveFromConfigPath = (
+  configPath: string,
+  filePath: string,
+): string => {
+  if (path.isAbsolute(filePath)) {
+    return filePath;
+  }
+
+  return path.resolve(path.dirname(configPath), filePath);
+};
+
 const runCommand = async (
   command: "run" | "status",
   options: CliOptions,
@@ -87,6 +99,7 @@ const runCommand = async (
   let tableName: string | undefined;
   let clusterName: string | undefined;
   let replicationPath: string | undefined;
+  let tls: MigrationRunnerTLSOptions | undefined;
   let templateVars: Record<string, unknown> | undefined;
 
   const configPath = options.config
@@ -119,6 +132,24 @@ const runCommand = async (
   tableName = envConfig.migrations.table_name;
   clusterName = envConfig.cluster_name;
   replicationPath = envConfig.migrations.replication_path;
+
+  if (envConfig.tls) {
+    const caPath = resolveFromConfigPath(configPath, envConfig.tls.ca_file);
+    const certPath = envConfig.tls.cert_file
+      ? resolveFromConfigPath(configPath, envConfig.tls.cert_file)
+      : undefined;
+
+    const keyPath = envConfig.tls.key_file
+      ? resolveFromConfigPath(configPath, envConfig.tls.key_file)
+      : undefined;
+
+    tls = {
+      caCert: await fs.readFile(caPath),
+      cert: certPath ? await fs.readFile(certPath) : undefined,
+      key: keyPath ? await fs.readFile(keyPath) : undefined,
+    };
+  }
+
   templateVars = {
     ...(envConfig.migrations.vars || {}),
     ...(envConfig.cluster_name ? { cluster_name: envConfig.cluster_name } : {}),
@@ -134,6 +165,7 @@ const runCommand = async (
       tableName,
       clusterName,
       replicationPath,
+      tls,
       templateVars,
     },
     command,

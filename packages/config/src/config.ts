@@ -15,10 +15,17 @@ export type MigrationConfig = {
   vars?: Record<string, unknown>;
 };
 
+export type TlsConfig = {
+  ca_file: string;
+  cert_file?: string;
+  key_file?: string;
+};
+
 export type EnvConfig = {
   url: string;
   exclude?: string[];
   cluster_name?: string;
+  tls?: TlsConfig;
   migrations: MigrationConfig;
 };
 
@@ -37,6 +44,11 @@ type HCLEnvBlock = {
   url: string[] | string;
   exclude?: string[][] | string[];
   cluster_name?: string[] | string;
+  tls?: Array<{
+    ca_file?: string[] | string;
+    cert_file?: string[] | string;
+    key_file?: string[] | string;
+  }>;
   migrations: Array<{
     dir: string[] | string;
     table_name?: string[] | string;
@@ -159,7 +171,43 @@ export const parseConfig = async (
   const clusterNameValue = envBlock.cluster_name
     ? resolveValue(extractValue(envBlock.cluster_name, ""), env, variables)
     : "";
+
   const clusterName = clusterNameValue || undefined;
+  const tlsBlock = envBlock.tls?.[0];
+
+  let tls: TlsConfig | undefined;
+
+  if (tlsBlock) {
+    const caFile = tlsBlock.ca_file
+      ? resolveValue(extractValue(tlsBlock.ca_file, ""), env, variables)
+      : "";
+
+    const certFile = tlsBlock.cert_file
+      ? resolveValue(extractValue(tlsBlock.cert_file, ""), env, variables)
+      : "";
+
+    const keyFile = tlsBlock.key_file
+      ? resolveValue(extractValue(tlsBlock.key_file, ""), env, variables)
+      : "";
+
+    if (!caFile) {
+      throw new Error(
+        `TLS block in environment "${targetEnv}" requires ca_file`,
+      );
+    }
+
+    if ((certFile && !keyFile) || (!certFile && keyFile)) {
+      throw new Error(
+        `TLS block in environment "${targetEnv}" requires both cert_file and key_file for mTLS`,
+      );
+    }
+
+    tls = {
+      ca_file: caFile,
+      cert_file: certFile || undefined,
+      key_file: keyFile || undefined,
+    };
+  }
 
   // Parse exclude patterns (optional)
   const excludePatterns = extractList(envBlock.exclude, []);
@@ -168,6 +216,7 @@ export const parseConfig = async (
     url: resolveValue(url, env, variables),
     exclude: excludePatterns,
     cluster_name: clusterName,
+    tls,
     migrations: {
       dir: resolveValue(migrationDir, env, variables),
       table_name: tableName,

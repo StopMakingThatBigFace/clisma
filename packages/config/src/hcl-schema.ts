@@ -45,6 +45,14 @@ export const clismaSchema = {
           },
           description: "Optional glob patterns to exclude tables.",
         },
+        tls: {
+          type: "array",
+          items: {
+            $ref: "#/$defs/tlsBlock",
+          },
+          description:
+            "Optional TLS settings for custom CA and mutual TLS client certificates.",
+        },
         migrations: {
           type: "array",
           items: {
@@ -77,6 +85,27 @@ export const clismaSchema = {
           additionalProperties: {
             $ref: "#/$defs/variableValue",
           },
+        },
+      },
+    },
+    tlsBlock: {
+      type: "object",
+      additionalProperties: false,
+      required: ["ca_file"],
+      properties: {
+        ca_file: {
+          type: "string",
+          description:
+            "Path to CA certificate file (PEM) used to verify the server certificate.",
+        },
+        cert_file: {
+          type: "string",
+          description:
+            "Path to client certificate file (PEM) for mutual TLS.",
+        },
+        key_file: {
+          type: "string",
+          description: "Path to client private key file (PEM) for mutual TLS.",
         },
       },
     },

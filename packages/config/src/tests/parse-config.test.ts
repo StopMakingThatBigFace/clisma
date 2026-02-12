@@ -23,6 +23,22 @@ variable "ttl_days" {
 }
 `;
 
+const SAMPLE_HCL_WITH_TLS = `
+env "prod" {
+  url = "https://default:password@localhost:8443/default"
+
+  tls {
+    ca_file = env("TLS_CA_FILE")
+    cert_file = "certs/client.pem"
+    key_file = "certs/client.key"
+  }
+
+  migrations {
+    dir = "migrations"
+  }
+}
+`;
+
 test("parseConfig resolves env() and var.* values", async () => {
   const config = await parseConfig(
     SAMPLE_HCL,
@@ -38,4 +54,45 @@ test("parseConfig resolves env() and var.* values", async () => {
   assert.equal(config.migrations.vars?.ttl, "30");
   assert.equal(config.migrations.vars?.ttl_static, "var.ttl_days");
   assert.equal(config.migrations.vars?.ttl_unexisting, "");
+});
+
+test("parseConfig resolves TLS block and validates mTLS fields", async () => {
+  const config = await parseConfig(
+    SAMPLE_HCL_WITH_TLS,
+    {
+      TLS_CA_FILE: "certs/ca.pem",
+    },
+    {},
+    "prod",
+  );
+
+  assert.equal(config.tls?.ca_file, "certs/ca.pem");
+  assert.equal(config.tls?.cert_file, "certs/client.pem");
+  assert.equal(config.tls?.key_file, "certs/client.key");
+});
+
+test("parseConfig throws when only one mTLS file is provided", async () => {
+  await assert.rejects(
+    () =>
+      parseConfig(
+        `
+env "prod" {
+  url = "https://default:password@localhost:8443/default"
+
+  tls {
+    ca_file = "certs/ca.pem"
+    cert_file = "certs/client.pem"
+  }
+
+  migrations {
+    dir = "migrations"
+  }
+}
+`,
+        {},
+        {},
+        "prod",
+      ),
+    /requires both cert_file and key_file/,
+  );
 });

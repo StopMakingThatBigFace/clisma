@@ -26,14 +26,20 @@ env "local" {
 ## env "name"
 
 ```hcl
-env "local" {
+
+env "production" {
   url = "http://default:password@localhost:8123/mydb"
-  cluster_name = "prod-cluster"
+  cluster_name = "dwh"
+
+  tls {
+    ca_file = "certs/ca.pem"
+  }
 
   migrations {
     dir = "migrations"
     table_name = "schema_migrations"
-    replication_path = "/clickhouse/tables/prod/schema_migrations"
+    replication_path = "/clickhouse/tables/{cluster}/schema_migrations"
+
     vars = {
       ttl_days = 30
     }
@@ -47,6 +53,10 @@ Fields:
 - `cluster_name` (string, optional) Cluster name used for template context and replicated tracking. Required when your server has clusters configured.
 - `exclude` (list\<string\>, optional) Patterns to ignore.
 - `migrations` (block) Migration settings.
+- `tls` (block, optional) TLS certificate settings for custom CA and mTLS:
+  - `ca_file` (string, required if `tls` is set) Path to CA certificate in PEM format.
+  - `cert_file` (string, optional) Client certificate in PEM format.
+  - `key_file` (string, optional) Client key in PEM format. Must be provided together with `cert_file`.
 
 ## migrations
 

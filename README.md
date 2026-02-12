@@ -85,6 +85,31 @@ env "production" {
 
 #### If your ClickHouse server has clusters configured, `cluster_name` is required
 
+### TLS certificates (custom CA and mTLS)
+
+If your ClickHouse endpoint uses a self-signed certificate, add a `tls` block so clisma can trust your CA.
+
+```hcl
+env "production" {
+  url = env("CLICKHOUSE_URL") # e.g. https://user:pass@host:8443/db?secure=true
+
+  tls {
+    ca_file = env("CLICKHOUSE_CA_FILE")
+    # cert_file = env("CLICKHOUSE_CLIENT_CERT_FILE") # optional, for mTLS
+    # key_file  = env("CLICKHOUSE_CLIENT_KEY_FILE")  # optional, for mTLS
+  }
+
+  ...
+}
+```
+
+Notes:
+
+- `ca_file` is required when `tls` is set.
+- `cert_file` and `key_file` must be provided together.
+- Relative paths are resolved from the directory where `clisma.hcl` lives.
+- URL query params (like `?secure=true`) are preserved.
+
 ## 🧪 Templates
 
 Templates are [Handlebars](https://handlebarsjs.com/guide/expressions.html). Variables come from `migrations.vars` (and

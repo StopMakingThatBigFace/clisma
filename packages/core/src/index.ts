@@ -2,6 +2,7 @@ export { MigrationRunner, runMigrations } from "./migrations/runner.js";
 export type {
   MigrationCommand,
   MigrationRunnerOptions,
+  MigrationRunnerTLSOptions,
 } from "./migrations/types.js";
 export { findConfigFile, parseConfig } from "@clisma/config";
 export type {

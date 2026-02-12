@@ -1,9 +1,16 @@
+export type MigrationRunnerTLSOptions = {
+  caCert: Buffer;
+  cert?: Buffer;
+  key?: Buffer;
+};
+
 export type MigrationRunnerOptions = {
   migrationsDir: string;
   connectionString: string;
   clusterName?: string;
   tableName?: string;
   replicationPath?: string;
+  tls?: MigrationRunnerTLSOptions;
   templateVars?: Record<string, unknown>;
 };
 

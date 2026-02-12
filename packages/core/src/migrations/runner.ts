@@ -39,6 +39,7 @@ export class MigrationRunner {
   #tableName: string;
   #clusterName?: string;
   #replicationPath?: string;
+  #tls?: MigrationRunnerOptions["tls"];
   #templateVars: MigrationRunnerOptions["templateVars"];
   #initialized = false;
 
@@ -60,13 +61,25 @@ export class MigrationRunner {
     this.#tableName = options.tableName || "schema_migrations";
     this.#clusterName = options.clusterName;
     this.#replicationPath = options.replicationPath;
+    this.#tls = options.tls;
     this.#templateVars = options.templateVars || {};
 
+    const tls = this.#tls
+      ? {
+          ca_cert: this.#tls.caCert,
+          cert: this.#tls.cert,
+          key: this.#tls.key,
+        }
+      : undefined;
+
+    const clientUrl = `${url.protocol}//${url.host}${url.search}`;
+
     this.#client = createClient({
-      url: `${url.protocol}//${url.host}`,
+      url: clientUrl,
       username: decodeURIComponent(url.username),
       password: decodeURIComponent(url.password),
       database,
+      tls,
     });
 
     this.#repository = new MigrationRepository({
@@ -83,19 +96,24 @@ export class MigrationRunner {
     }
 
     const spinner = ora("Detecting cluster configuration...").start();
-    const clusterName = await this.#repository.initialize(this.#clusterName);
+    try {
+      const clusterName = await this.#repository.initialize(this.#clusterName);
 
-    if (clusterName) {
-      const message = this.#clusterName
-        ? `Using cluster from config: ${kleur.bold(clusterName)}`
-        : `Detected cluster: ${kleur.bold(clusterName)}`;
+      if (clusterName) {
+        const message = this.#clusterName
+          ? `Using cluster from config: ${kleur.bold(clusterName)}`
+          : `Detected cluster: ${kleur.bold(clusterName)}`;
 
-      spinner.succeed(kleur.green(message));
-    } else {
-      spinner.succeed("No cluster detected, using non-replicated mode");
+        spinner.succeed(kleur.green(message));
+      } else {
+        spinner.succeed("No cluster detected, using non-replicated mode");
+      }
+
+      this.#initialized = true;
+    } catch (error) {
+      spinner.fail("Failed to detect cluster configuration");
+      throw error;
     }
-
-    this.#initialized = true;
   }
 
   async run(): Promise<void> {
