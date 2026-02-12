@@ -33,7 +33,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@clisma/core": "^0.1.0",
+    "@clisma/core": "*",
     "@dotenvx/dotenvx": "^1.51.4",
     "@inquirer/prompts": "^8.2.0",
     "commander": "^12.1.0",
