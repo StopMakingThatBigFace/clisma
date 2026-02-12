@@ -1,6 +1,6 @@
 {
   "name": "clisma",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "ClickHouse migration CLI",
   "author": "github.com/will-work-for-meal",
   "license": "MIT",
