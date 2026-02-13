@@ -4,8 +4,7 @@ description: "Use Handlebars variables in migrations to adapt across environment
 icon: "notes-medical"
 ---
 
-Template variables come from `migrations.vars` in your config. If you set
-`migrations.table.cluster_name`, it is also available as `{{cluster_name}}`.
+Template variables come only from `migrations.vars` in your config.
 
 > If you have used Atlas, this will feel familiar. The idea is the same as
 > [Atlas templated migrations](https://atlasgo.io/concepts/migrations#template),
