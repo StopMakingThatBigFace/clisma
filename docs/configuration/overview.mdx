@@ -29,7 +29,6 @@ env "local" {
 
 env "production" {
   url = "http://default:password@localhost:8123/mydb"
-  cluster_name = "dwh"
 
   tls {
     ca_file = "certs/ca.pem"
@@ -37,8 +36,18 @@ env "production" {
 
   migrations {
     dir = "migrations"
-    table_name = "schema_migrations"
-    replication_path = "/clickhouse/tables/{cluster}/schema_migrations"
+
+    table {
+      name = "schema_migrations"
+
+      is_replicated = true
+
+      # Optional: force a specific cluster for ON CLUSTER.
+      cluster_name = "dwh"
+
+      # If replication_path is set, is_replicated can be omitted.
+      replication_path = "/clickhouse/tables/{cluster}/schema_migrations"
+    }
 
     vars = {
       ttl_days = 30
@@ -50,7 +59,6 @@ env "production" {
 Fields:
 
 - `url` (string) Connection string. Supports `env("NAME")`.
-- `cluster_name` (string, optional) Cluster name used for template context and replicated tracking. Required when your server has clusters configured.
 - `exclude` (list\<string\>, optional) Patterns to ignore.
 - `migrations` (block) Migration settings.
 - `tls` (block, optional) TLS certificate settings for custom CA and mTLS:
@@ -61,8 +69,11 @@ Fields:
 ## migrations
 
 - `dir` (string) Path to migrations directory.
-- `table_name` (string, optional) Custom tracking table.
-- `replication_path` (string, optional) Replication path for the tracking table.
+- `table` (block, optional) Tracking table settings.
+  - `table.name` (string, optional) Custom tracking table.
+  - `table.is_replicated` (bool, optional, default `false`) Use replicated tracking table with `ON CLUSTER`.
+  - `table.cluster_name` (string, optional) Cluster name override for `ON CLUSTER`. Useful when multiple clusters exist.
+  - `table.replication_path` (string, optional) Replication path for the tracking table. If set, replicated mode is enabled even when `table.is_replicated` is omitted.
 - `vars` (object, optional) Variables for Handlebars templates.
 
 ## variable "name"

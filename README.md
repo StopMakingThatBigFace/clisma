@@ -68,10 +68,22 @@ variable "ttl_days" {
 
 env "production" {
   url = env("CLICKHOUSE_PROD_URL")
-  cluster_name = "prod-cluster"
 
   migrations {
     dir = "migrations"
+
+    table {
+      name = "schema_migrations"
+
+      is_replicated = true
+
+      # Optional: force a specific cluster for ON CLUSTER.
+      cluster_name = "prod-cluster"
+
+      # If replication_path is set, is_replicated can be omitted.
+      replication_path = "/clickhouse/tables/cluster-{cluster}/shard-{shard}/{database}/schema_migrations"
+    }
+
     vars = {
       is_replicated = true
       create_table_options = "ON CLUSTER prod-cluster"
@@ -81,9 +93,12 @@ env "production" {
 }
 ```
 
-**`cluster_name`** affects how the migrations tracking table is created (replicated or not). And the CLI will warn if the actual cluster does not match the config.
+**`migrations.table`** controls the tracking table:
 
-#### If your ClickHouse server has clusters configured, `cluster_name` is required
+- `name` sets a custom table name.
+- `is_replicated = true` enables replicated tracking.
+- `cluster_name` optionally selects cluster for `ON CLUSTER`.
+- `replication_path` overrides the default replication path (and also enables replicated mode if `is_replicated` is omitted).
 
 ### TLS certificates (custom CA and mTLS)
 
@@ -111,8 +126,7 @@ Notes:
 
 ## 🧪 Templates
 
-Templates are [Handlebars](https://handlebarsjs.com/guide/expressions.html). Variables come from `migrations.vars` (and
-`cluster_name` is available as `{{cluster_name}}`).
+Templates are [Handlebars](https://handlebarsjs.com/guide/expressions.html). Variables come from `migrations.vars`.
 
 ```sql
 CREATE TABLE IF NOT EXISTS events {{create_table_options}} (

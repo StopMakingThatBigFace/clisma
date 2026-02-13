@@ -3,7 +3,15 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "paths": {
+      "@clisma/core": [
+        "../core/src/index.ts"
+      ],
+      "@clisma/config": [
+        "../config/src/index.ts"
+      ]
+    }
   },
   "references": [
     { "path": "../config" },

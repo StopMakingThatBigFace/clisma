@@ -7,6 +7,7 @@ export type MigrationRunnerTLSOptions = {
 export type MigrationRunnerOptions = {
   migrationsDir: string;
   connectionString: string;
+  isReplicated?: boolean;
   clusterName?: string;
   tableName?: string;
   replicationPath?: string;

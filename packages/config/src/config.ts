@@ -10,8 +10,12 @@ import {
 
 export type MigrationConfig = {
   dir: string;
-  table_name?: string;
-  replication_path?: string;
+  table?: {
+    name: string;
+    is_replicated: boolean;
+    cluster_name?: string;
+    replication_path?: string;
+  };
   vars?: Record<string, unknown>;
 };
 
@@ -24,7 +28,6 @@ export type TlsConfig = {
 export type EnvConfig = {
   url: string;
   exclude?: string[];
-  cluster_name?: string;
   tls?: TlsConfig;
   migrations: MigrationConfig;
 };
@@ -43,7 +46,6 @@ export type ClismaConfig = {
 type HCLEnvBlock = {
   url: string[] | string;
   exclude?: string[][] | string[];
-  cluster_name?: string[] | string;
   tls?: Array<{
     ca_file?: string[] | string;
     cert_file?: string[] | string;
@@ -51,8 +53,12 @@ type HCLEnvBlock = {
   }>;
   migrations: Array<{
     dir: string[] | string;
-    table_name?: string[] | string;
-    replication_path?: string[] | string;
+    table?: Array<{
+      name?: string[] | string;
+      is_replicated?: boolean[] | boolean;
+      cluster_name?: string[] | string;
+      replication_path?: string[] | string;
+    }>;
     vars?: Record<string, unknown>[] | Record<string, unknown>;
   }>;
 };
@@ -147,17 +153,25 @@ export const parseConfig = async (
     }
   }
 
-  // Parse optional table_name
-  const tableName = migrationBlock.table_name
-    ? extractValue(migrationBlock.table_name, "schema_migrations")
+  const tableBlock = migrationBlock.table?.[0];
+  const tableName = tableBlock?.name
+    ? extractValue(tableBlock.name, "schema_migrations")
     : "schema_migrations";
-  const replicationPath = migrationBlock.replication_path
+  const clusterName = tableBlock?.cluster_name
+    ? resolveValue(extractValue(tableBlock.cluster_name, ""), env, variables) ||
+      undefined
+    : undefined;
+  const replicationPath = tableBlock?.replication_path
     ? resolveValue(
-        extractValue(migrationBlock.replication_path, ""),
+        extractValue(tableBlock.replication_path, ""),
         env,
         variables,
       ) || undefined
     : undefined;
+  const hasIsReplicated = tableBlock?.is_replicated !== undefined;
+  const isReplicated = hasIsReplicated
+    ? extractValue(tableBlock?.is_replicated, false)
+    : Boolean(replicationPath || clusterName);
 
   // Parse URL
   const url = extractValue(envBlock.url, "");
@@ -168,11 +182,6 @@ export const parseConfig = async (
     );
   }
 
-  const clusterNameValue = envBlock.cluster_name
-    ? resolveValue(extractValue(envBlock.cluster_name, ""), env, variables)
-    : "";
-
-  const clusterName = clusterNameValue || undefined;
   const tlsBlock = envBlock.tls?.[0];
 
   let tls: TlsConfig | undefined;
@@ -215,12 +224,15 @@ export const parseConfig = async (
   return {
     url: resolveValue(url, env, variables),
     exclude: excludePatterns,
-    cluster_name: clusterName,
     tls,
     migrations: {
       dir: resolveValue(migrationDir, env, variables),
-      table_name: tableName,
-      replication_path: replicationPath,
+      table: {
+        name: tableName,
+        is_replicated: isReplicated,
+        cluster_name: clusterName,
+        replication_path: replicationPath,
+      },
       vars: resolvedVars,
     },
   };

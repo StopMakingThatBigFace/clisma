@@ -23,6 +23,7 @@ export class MigrationRunner {
   #client: ClickHouseClient;
   #repository: MigrationRepository;
   #tableName: string;
+  #isReplicated: boolean;
   #clusterName?: string;
   #replicationPath?: string;
   #tls?: MigrationRunnerOptions["tls"];
@@ -45,6 +46,7 @@ export class MigrationRunner {
     }
 
     this.#tableName = options.tableName || "schema_migrations";
+    this.#isReplicated = options.isReplicated || false;
     this.#clusterName = options.clusterName;
     this.#replicationPath = options.replicationPath;
     this.#tls = options.tls;
@@ -88,17 +90,21 @@ export class MigrationRunner {
     }
 
     const spinner = ora("Detecting cluster configuration...").start();
+
     try {
-      const clusterName = await this.#repository.initialize(this.#clusterName);
+      const clusterName = await this.#repository.initialize(
+        this.#isReplicated,
+        this.#clusterName,
+      );
 
       if (clusterName) {
-        const message = this.#clusterName
-          ? `Using cluster from config: ${kleur.bold(clusterName)}`
-          : `Detected cluster: ${kleur.bold(clusterName)}`;
-
-        spinner.succeed(kleur.green(message));
+        spinner.succeed(
+          kleur.green(
+            `Replicated mode enabled on cluster: ${kleur.bold(clusterName)}`,
+          ),
+        );
       } else {
-        spinner.info("No cluster detected, using non-replicated mode");
+        spinner.info("Using non-replicated mode");
       }
 
       this.#initialized = true;

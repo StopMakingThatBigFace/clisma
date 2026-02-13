@@ -39,6 +39,50 @@ env "prod" {
 }
 `;
 
+const SAMPLE_HCL_WITH_TABLE = `
+env "prod" {
+  url = "http://default:password@localhost:8123/default"
+
+  migrations {
+    dir = "migrations"
+
+    table {
+      name = "custom_migrations"
+      is_replicated = true
+      replication_path = "/clickhouse/some/path"
+    }
+  }
+}
+`;
+
+const SAMPLE_HCL_WITH_ONLY_REPLICATION_PATH = `
+env "prod" {
+  url = "http://default:password@localhost:8123/default"
+
+  migrations {
+    dir = "migrations"
+
+    table {
+      replication_path = "/clickhouse/some/path"
+    }
+  }
+}
+`;
+
+const SAMPLE_HCL_WITH_CLUSTER_NAME = `
+env "prod" {
+  url = "http://default:password@localhost:8123/default"
+
+  migrations {
+    dir = "migrations"
+
+    table {
+      cluster_name = "prod-cluster"
+    }
+  }
+}
+`;
+
 test("parseConfig resolves env() and var.* values", async () => {
   const config = await parseConfig(
     SAMPLE_HCL,
@@ -69,6 +113,39 @@ test("parseConfig resolves TLS block and validates mTLS fields", async () => {
   assert.equal(config.tls?.ca_file, "certs/ca.pem");
   assert.equal(config.tls?.cert_file, "certs/client.pem");
   assert.equal(config.tls?.key_file, "certs/client.key");
+});
+
+test("parseConfig parses migrations.table block", async () => {
+  const config = await parseConfig(SAMPLE_HCL_WITH_TABLE, {}, {}, "prod");
+
+  assert.equal(config.migrations.table?.name, "custom_migrations");
+  assert.equal(config.migrations.table?.is_replicated, true);
+  assert.equal(
+    config.migrations.table?.replication_path,
+    "/clickhouse/some/path",
+  );
+});
+
+test("parseConfig enables replication when replication_path is set", async () => {
+  const config = await parseConfig(
+    SAMPLE_HCL_WITH_ONLY_REPLICATION_PATH,
+    {},
+    {},
+    "prod",
+  );
+
+  assert.equal(config.migrations.table?.is_replicated, true);
+  assert.equal(
+    config.migrations.table?.replication_path,
+    "/clickhouse/some/path",
+  );
+});
+
+test("parseConfig enables replication when cluster_name is set", async () => {
+  const config = await parseConfig(SAMPLE_HCL_WITH_CLUSTER_NAME, {}, {}, "prod");
+
+  assert.equal(config.migrations.table?.is_replicated, true);
+  assert.equal(config.migrations.table?.cluster_name, "prod-cluster");
 });
 
 test("parseConfig throws when only one mTLS file is provided", async () => {
