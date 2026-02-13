@@ -167,7 +167,6 @@ const runCommand = async (
 
   templateVars = {
     ...(envConfig.migrations.vars || {}),
-    ...(clusterName ? { cluster_name: clusterName } : {}),
   };
 
   console.log(
