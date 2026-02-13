@@ -1,0 +1,6 @@
+# Build artifacts
+*.vsix
+
+# Keep launch config if present, ignore other local VS Code files
+.vscode/*
+!.vscode/launch.json

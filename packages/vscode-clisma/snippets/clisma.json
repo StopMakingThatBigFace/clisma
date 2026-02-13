@@ -1,0 +1,110 @@
+{
+  "Env block": {
+    "scope": "clisma",
+    "prefix": "env",
+    "description": "Create an env block",
+    "body": [
+      "env \"${1:local}\" {",
+      "  url = \"${2:http://default:password@localhost:8123/default}\"",
+      "",
+      "  migrations {",
+      "    dir = \"${3:migrations}\"",
+      "  }",
+      "}"
+    ]
+  },
+  "Variable block": {
+    "scope": "clisma",
+    "prefix": "variable",
+    "description": "Create a variable block",
+    "body": [
+      "variable \"${1:name}\" {",
+      "  type = \"${2:string}\"",
+      "  default = ${3:\"value\"}",
+      "  description = \"${4:Variable description}\"",
+      "}"
+    ]
+  },
+  "Migrations block": {
+    "scope": "clisma",
+    "prefix": "migrations",
+    "description": "Create a migrations block",
+    "body": [
+      "migrations {",
+      "  dir = \"${1:migrations}\"",
+      "",
+      "  table {",
+      "    name = \"${2:schema_migrations}\"",
+      "    is_replicated = ${3:false}",
+      "    cluster_name = \"${4:cluster}\"",
+      "    replication_path = \"${5:/clickhouse/tables/{cluster}/schema_migrations}\"",
+      "  }",
+      "",
+      "  vars = {",
+      "    ${6:key} = ${7:\"value\"}",
+      "  }",
+      "}"
+    ]
+  },
+  "TLS block": {
+    "scope": "clisma",
+    "prefix": "tls",
+    "description": "Create a tls block",
+    "body": [
+      "tls {",
+      "  ca_file = \"${1:certs/ca.pem}\"",
+      "  cert_file = \"${2:certs/client.pem}\"",
+      "  key_file = \"${3:certs/client.key}\"",
+      "}"
+    ]
+  },
+  "Table block": {
+    "scope": "clisma",
+    "prefix": "table",
+    "description": "Create a table block",
+    "body": [
+      "table {",
+      "  name = \"${1:schema_migrations}\"",
+      "  is_replicated = ${2:false}",
+      "  cluster_name = \"${3:cluster}\"",
+      "  replication_path = \"${4:/clickhouse/tables/{cluster}/schema_migrations}\"",
+      "}"
+    ]
+  },
+  "Property url": {
+    "scope": "clisma",
+    "prefix": "url",
+    "description": "Connection URL property",
+    "body": [
+      "url = \"${1:http://default:password@localhost:8123/default}\""
+    ]
+  },
+  "Property dir": {
+    "scope": "clisma",
+    "prefix": "dir",
+    "description": "Migrations directory property",
+    "body": [
+      "dir = \"${1:migrations}\""
+    ]
+  },
+  "Property exclude": {
+    "scope": "clisma",
+    "prefix": "exclude",
+    "description": "Exclude patterns property",
+    "body": [
+      "exclude = [",
+      "  \"${1:analytics_*}\"",
+      "]"
+    ]
+  },
+  "Property vars": {
+    "scope": "clisma",
+    "prefix": "vars",
+    "description": "Variables map for migrations",
+    "body": [
+      "vars = {",
+      "  ${1:key} = ${2:\"value\"}",
+      "}"
+    ]
+  }
+}
