@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "rootBlocks": [
+    "env",
+    "variable"
+  ],
+  "blocks": {
+    "env": {
+      "fields": [
+        "url",
+        "exclude"
+      ],
+      "fieldTypes": {
+        "url": "string",
+        "exclude": "array"
+      },
+      "requiredFields": [
+        "url",
+        "migrations"
+      ],
+      "nestedBlocks": [
+        "tls",
+        "migrations"
+      ]
+    },
+    "variable": {
+      "fields": [
+        "type",
+        "default",
+        "description"
+      ],
+      "fieldTypes": {
+        "type": "string",
+        "default": "any",
+        "description": "string"
+      },
+      "requiredFields": [
+        "type"
+      ],
+      "nestedBlocks": []
+    },
+    "tls": {
+      "fields": [
+        "ca_file",
+        "cert_file",
+        "key_file"
+      ],
+      "fieldTypes": {
+        "ca_file": "string",
+        "cert_file": "string",
+        "key_file": "string"
+      },
+      "requiredFields": [
+        "ca_file"
+      ],
+      "nestedBlocks": []
+    },
+    "migrations": {
+      "fields": [
+        "dir",
+        "vars"
+      ],
+      "fieldTypes": {
+        "dir": "string",
+        "vars": "object"
+      },
+      "requiredFields": [
+        "dir"
+      ],
+      "nestedBlocks": [
+        "table"
+      ]
+    },
+    "table": {
+      "fields": [
+        "name",
+        "is_replicated",
+        "cluster_name",
+        "replication_path"
+      ],
+      "fieldTypes": {
+        "name": "string",
+        "is_replicated": "boolean",
+        "cluster_name": "string",
+        "replication_path": "string"
+      },
+      "requiredFields": [],
+      "nestedBlocks": []
+    }
+  },
+  "variableTypeEnum": [
+    "string",
+    "number",
+    "bool",
+    "any"
+  ]
+}

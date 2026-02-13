@@ -1,0 +1,117 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Clisma",
+  "scopeName": "source.clisma",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#blocks"
+    },
+    {
+      "include": "#variables"
+    },
+    {
+      "include": "#properties"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#booleans"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.clisma",
+          "match": "#.*$"
+        },
+        {
+          "name": "comment.line.double-slash.clisma",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.clisma",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "blocks": {
+      "patterns": [
+        {
+          "name": "meta.block.env.clisma",
+          "match": "\\b(env|variable|migrations|table|tls)\\b"
+        }
+      ]
+    },
+    "variables": {
+      "patterns": [
+        {
+          "name": "entity.name.section.clisma",
+          "match": "(?<=\\b(?:env|variable)\\s+\")[^\"]+(?=\")"
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "name": "variable.other.property.clisma",
+          "match": "\\b(url|exclude|dir|vars|name|is_replicated|cluster_name|replication_path|ca_file|cert_file|key_file|type|default|description)\\b(?=\\s*=)"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.clisma",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.clisma",
+              "match": "\\\\."
+            },
+            {
+              "name": "support.function.template.clisma",
+              "match": "\\b(env|var)\\s*\\("
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.clisma",
+          "match": "\\b-?(?:0|[1-9]\\d*)(?:\\.\\d+)?\\b"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.clisma",
+          "match": "\\b(true|false|null)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.assignment.clisma",
+          "match": "="
+        }
+      ]
+    }
+  }
+}
