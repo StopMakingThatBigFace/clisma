@@ -39,19 +39,3 @@ env "local" {
   }
 }
 ```
-
-## Cluster name
-
-If you want the migrations table to be replicated and use cluster-aware templates, set
-`cluster_name` in the environment:
-
-```hcl
-env "production" {
-  url = env("CLICKHOUSE_PROD_URL")
-  cluster_name = "prod-cluster"
-
-  migrations {
-    dir = "migrations"
-  }
-}
-```

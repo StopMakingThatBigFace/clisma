@@ -24,6 +24,7 @@ env "staging" {
 
   migrations {
     dir = "migrations"
+
     vars = {
       replication_factor = 2
       ttl_days = 30
@@ -37,7 +38,6 @@ env "staging" {
 ```hcl
 env "production" {
   url = env("CLICKHOUSE_PROD_URL")
-  cluster_name = "prod-cluster"
   exclude = ["system.*", "_tmp_*"]
 
   tls {
@@ -48,7 +48,12 @@ env "production" {
 
   migrations {
     dir = "migrations"
-    table_name = "schema_migrations"
+
+    table {
+      name = "schema_migrations"
+      is_replicated = true
+    }
+
     vars = {
       replication_factor = var.replication_factor
       ttl_days = 90

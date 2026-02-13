@@ -1,6 +1,6 @@
 {
   "name": "@clisma/core",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Core ClickHouse migration logic for clisma",
   "type": "module",
   "main": "dist/index.js",
@@ -13,7 +13,7 @@
     "url": "git+https://github.com/StopMakingThatBigFace/clisma.git"
   },
   "dependencies": {
-    "@clisma/config": "0.2.1",
+    "@clisma/config": "0.3.0",
     "@clickhouse/client": "^1.11.2",
     "handlebars": "^4.7.8",
     "kleur": "^4.1.5",

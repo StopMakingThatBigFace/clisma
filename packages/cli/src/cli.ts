@@ -105,6 +105,7 @@ const runCommand = async (
   let migrationsDir: string;
   let connectionString: string;
   let tableName: string | undefined;
+  let isReplicated = false;
   let clusterName: string | undefined;
   let replicationPath: string | undefined;
   let tls: MigrationRunnerTLSOptions | undefined;
@@ -142,10 +143,10 @@ const runCommand = async (
     envConfig.migrations.dir,
   );
 
-  // Extract table_name, cluster_name, and replication_path from config
-  tableName = envConfig.migrations.table_name;
-  clusterName = envConfig.cluster_name;
-  replicationPath = envConfig.migrations.replication_path;
+  tableName = envConfig.migrations.table?.name;
+  isReplicated = envConfig.migrations.table?.is_replicated || false;
+  clusterName = envConfig.migrations.table?.cluster_name;
+  replicationPath = envConfig.migrations.table?.replication_path;
 
   if (envConfig.tls) {
     const caPath = resolveFromConfigPath(configPath, envConfig.tls.ca_file);
@@ -166,7 +167,7 @@ const runCommand = async (
 
   templateVars = {
     ...(envConfig.migrations.vars || {}),
-    ...(envConfig.cluster_name ? { cluster_name: envConfig.cluster_name } : {}),
+    ...(clusterName ? { cluster_name: clusterName } : {}),
   };
 
   console.log(
@@ -180,6 +181,7 @@ const runCommand = async (
       migrationsDir,
       connectionString,
       tableName,
+      isReplicated,
       clusterName,
       replicationPath,
       tls,

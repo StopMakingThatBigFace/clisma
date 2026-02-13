@@ -33,11 +33,6 @@ export const clismaSchema = {
           type: "string",
           description: "ClickHouse connection string.",
         },
-        cluster_name: {
-          type: "string",
-          description:
-            "Optional cluster name. When set, migrations use replicated tracking and templating.",
-        },
         exclude: {
           type: "array",
           items: {
@@ -70,14 +65,12 @@ export const clismaSchema = {
           type: "string",
           description: "Path to migrations directory.",
         },
-        table_name: {
-          type: "string",
-          description: "Custom table name for migration tracking.",
-        },
-        replication_path: {
-          type: "string",
-          description:
-            "Optional replication path for the migrations table in clustered setups.",
+        table: {
+          type: "array",
+          items: {
+            $ref: "#/$defs/tableBlock",
+          },
+          description: "Migrations tracking table configuration.",
         },
         vars: {
           type: "object",
@@ -85,6 +78,31 @@ export const clismaSchema = {
           additionalProperties: {
             $ref: "#/$defs/variableValue",
           },
+        },
+      },
+    },
+    tableBlock: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        name: {
+          type: "string",
+          description: "Custom table name for migration tracking.",
+        },
+        is_replicated: {
+          type: "boolean",
+          description:
+            "Whether tracking table should use ReplicatedReplacingMergeTree and ON CLUSTER.",
+        },
+        cluster_name: {
+          type: "string",
+          description:
+            "Optional cluster name override for ON CLUSTER when replicated mode is enabled.",
+        },
+        replication_path: {
+          type: "string",
+          description:
+            "Optional replication path for the migrations table in replicated setups.",
         },
       },
     },

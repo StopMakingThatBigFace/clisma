@@ -39,57 +39,54 @@ export class MigrationRepository {
     return this.#ctx;
   }
 
-  async initialize(clusterName?: string): Promise<string | null> {
+  async initialize(
+    isReplicated = false,
+    clusterName?: string,
+  ): Promise<string | null> {
     if (this.#ctx) {
       return this.#ctx.cluster || null;
     }
 
-    const clusters = await this.#listClusters();
-    const clusterNames = Array.from(
-      new Set(clusters.map((cluster) => cluster.cluster)),
-    );
+    if (isReplicated) {
+      const clusters = await this.#listClusters();
+      const clusterNames = Array.from(
+        new Set(clusters.map((cluster) => cluster.cluster)),
+      );
+      const nonDefault = clusterNames.filter((name) => name !== "default");
 
-    const hasNonDefaultCluster = clusterNames.some(
-      (name) => name !== "default",
-    );
-
-    const defaultClusterRows = clusters.filter(
-      (cluster) => cluster.cluster === "default",
-    );
-
-    const defaultHasReplicasOrShards = defaultClusterRows.some(
-      (row) => row.replica_num > 1 || row.shard_num > 1,
-    );
-
-    if (!clusterName) {
-      if (hasNonDefaultCluster || defaultHasReplicasOrShards) {
-        const available = clusterNames.length
-          ? clusterNames.join(", ")
-          : "none";
-
+      let selectedCluster = clusterName;
+      if (selectedCluster) {
+        if (!clusterNames.includes(selectedCluster)) {
+          throw new Error(
+            `Cluster "${selectedCluster}" not found. Available clusters: ${clusterNames.join(", ")}`,
+          );
+        }
+      } else if (nonDefault.length === 1) {
+        selectedCluster = nonDefault[0];
+      } else if (nonDefault.length > 1) {
         throw new Error(
-          `Cluster detected but no cluster_name provided. ` +
-            `Set env.cluster_name in config. Available clusters: ${available}`,
+          `Multiple non-default clusters found: ${nonDefault.join(", ")}. ` +
+            "Set migrations.table.cluster_name to choose one.",
+        );
+      } else if (clusterNames.includes("default")) {
+        selectedCluster = "default";
+      }
+
+      if (!selectedCluster) {
+        throw new Error(
+          "Replicated migrations table requested, but no cluster found in system.clusters.",
         );
       }
-    } else if (!clusterNames.includes(clusterName)) {
-      const available = clusterNames.length ? clusterNames.join(", ") : "none";
 
-      throw new Error(
-        `Cluster "${clusterName}" not found. Available clusters: ${available}`,
-      );
-    }
-
-    if (clusterName) {
-      const safeClusterName = clusterName.replace(/"/g, '\\"');
+      const safeClusterName = selectedCluster.replace(/"/g, '\\"');
 
       this.#ctx = {
         is_replicated: true,
         create_table_options: `ON CLUSTER "${safeClusterName}"`,
-        cluster: clusterName,
+        cluster: selectedCluster,
       };
 
-      return clusterName;
+      return selectedCluster;
     }
 
     this.#ctx = {
@@ -103,6 +100,7 @@ export class MigrationRepository {
 
   async ensureMigrationsTable(): Promise<void> {
     const ctx = this.getContext();
+    const existedBefore = await this.#migrationsTableExists();
     const replicationPath = this.#replicationPath
       ? this.#replicationPath
       : `/clickhouse/tables/cluster-{cluster}/shard-{shard}/{database}/${this.#tableName}`;
@@ -127,6 +125,15 @@ export class MigrationRepository {
         ORDER BY version
       `,
     });
+
+    if (!existedBefore) {
+      const mode = ctx.is_replicated ? "replicated" : "non-replicated";
+      console.log(
+        kleur.green(
+          `Created migrations table ${kleur.bold(this.#tableName)} in ${mode} mode`,
+        ),
+      );
+    }
   }
 
   async getAppliedMigrations(): Promise<Map<string, MigrationRecord>> {
@@ -204,5 +211,21 @@ export class MigrationRepository {
       shard_num: number;
       replica_num: number;
     }>();
+  }
+
+  async #migrationsTableExists(): Promise<boolean> {
+    const safeTableName = this.#tableName.replace(/'/g, "\\'");
+    const result = await this.#client.query({
+      query: `
+        SELECT count() AS count
+        FROM system.tables
+        WHERE database = currentDatabase() AND name = '${safeTableName}'
+      `,
+      format: "JSONEachRow",
+    });
+
+    const rows = await result.json<{ count: number }>();
+
+    return (rows[0]?.count || 0) > 0;
   }
 }

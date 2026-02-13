@@ -14,7 +14,10 @@ env "local" {
 
   migrations {
     dir = "migrations"
-    table_name = "custom_schema_migrations"
+
+    table {
+      name = "custom_schema_migrations"
+    }
   }
 }
 ```
@@ -26,12 +29,21 @@ In clustered setups you can override the migrations table replication path used 
 ```hcl
 env "production" {
   url = env("CLICKHOUSE_PROD_URL")
-  cluster_name = "prod-cluster"
 
   migrations {
     dir = "migrations"
-    table_name = "custom_schema_migrations"
-    replication_path = "/clickhouse/foo/bar/custom_schema_migrations"
+
+    table {
+      name = "custom_schema_migrations"
+
+      is_replicated = true
+
+      # Optional: force a specific cluster for ON CLUSTER.
+      cluster_name = "prod-cluster"
+
+      # If replication_path is set, is_replicated can be omitted.
+      replication_path = "/clickhouse/foo/bar/custom_schema_migrations"
+    }
   }
 }
 ```
@@ -39,14 +51,91 @@ env "production" {
 Default replication path:
 
 ```text
-/clickhouse/tables/cluster-{cluster}/shard-{shard}/{database}/${migrations.table_name}
+/clickhouse/tables/cluster-{cluster}/shard-{shard}/{database}/${migrations.table.name}
 ```
 
 ### Summary
 
-If `env.cluster_name` is set, clisma treats the environment as clustered and creates the migrations table using `ReplicatedReplacingMergeTree(...)` with `ON CLUSTER "<cluster_name>"`.
+If `migrations.table.is_replicated` is `true`, clisma treats the environment as clustered and creates the migrations table using `ReplicatedReplacingMergeTree(...)` with `ON CLUSTER "<detected_cluster>"`.
 
-If `cluster_name` is not set in config and ClickHouse reports configured clusters, clisma stops and asks you to set `cluster_name`. If there are no clusters, it uses `ReplacingMergeTree()` in standalone mode.
+If `migrations.table.is_replicated` is not set (or `false`), it uses `ReplacingMergeTree()` in standalone mode.
+
+If `migrations.table.replication_path` is set, clisma also enables replicated mode even when `migrations.table.is_replicated` is omitted.
+
+If your ClickHouse has multiple non-default clusters, set `migrations.table.cluster_name` to choose which cluster should be used in `ON CLUSTER`.
+
+## How config affects migrations table DDL
+
+### 1) Standalone (default)
+
+Config:
+
+```hcl
+migrations {
+  dir = "migrations"
+}
+```
+
+DDL shape:
+
+```sql
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  ...
+) ENGINE = ReplacingMergeTree()
+ORDER BY version;
+```
+
+### 2) Replicated (auto cluster detection)
+
+Config:
+
+```hcl
+migrations {
+  dir = "migrations"
+  table {
+    is_replicated = true
+  }
+}
+```
+
+DDL shape:
+
+```sql
+CREATE TABLE IF NOT EXISTS schema_migrations ON CLUSTER "<detected_cluster>" (
+  ...
+) ENGINE = ReplicatedReplacingMergeTree(
+  '/clickhouse/tables/cluster-{cluster}/shard-{shard}/{database}/schema_migrations',
+  '{replica}'
+)
+ORDER BY version;
+```
+
+### 3) Replicated with explicit cluster and path
+
+Config:
+
+```hcl
+migrations {
+  dir = "migrations"
+  table {
+    name = "custom_schema_migrations"
+    cluster_name = "prod-cluster"
+    replication_path = "/clickhouse/foo/bar/custom_schema_migrations"
+  }
+}
+```
+
+DDL shape:
+
+```sql
+CREATE TABLE IF NOT EXISTS custom_schema_migrations ON CLUSTER "prod-cluster" (
+  ...
+) ENGINE = ReplicatedReplacingMergeTree(
+  '/clickhouse/foo/bar/custom_schema_migrations',
+  '{replica}'
+)
+ORDER BY version;
+```
 
 ## Does clisma support down migrations?
 
