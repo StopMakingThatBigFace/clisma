@@ -1,5 +1,7 @@
 # 💊 clisma
 
+[![NPM Version](https://img.shields.io/npm/v/clisma?labelColor=EE4B2B&color=FFBF00&style=badge)](https://www.npmjs.com/package/clisma)
+
 **A ClickHouse migrations CLI with templated SQL and environment-aware config.**
 
 ### 💅 [See full Docs →](https://clisma.poorquality.tech/)
