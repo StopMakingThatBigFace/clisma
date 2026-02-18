@@ -5,7 +5,7 @@ export const renderTemplate = (
   content: string,
   ctx: MigrationRunnerOptions["templateVars"] = {},
 ): string => {
-  const template = Handlebars.compile(content);
+  const template = Handlebars.compile(content, { noEscape: true });
 
   return template(ctx);
 };

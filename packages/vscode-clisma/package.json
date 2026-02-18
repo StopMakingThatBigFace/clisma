@@ -2,7 +2,7 @@
   "name": "vscode-clisma",
   "displayName": "clisma",
   "description": "Syntax highlighting and autocomplete for clisma schema files",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "StopMakingThatBigFace",
   "license": "MIT",
   "repository": {

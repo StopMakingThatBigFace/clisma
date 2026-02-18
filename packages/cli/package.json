@@ -1,6 +1,6 @@
 {
   "name": "clisma",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "ClickHouse migration CLI",
   "author": "github.com/StopMakingThatBigFace",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@clisma/core": "0.3.0",
+    "@clisma/core": "0.3.1",
     "@dotenvx/dotenvx": "^1.51.4",
     "@inquirer/prompts": "^8.2.0",
     "commander": "^12.1.0",
